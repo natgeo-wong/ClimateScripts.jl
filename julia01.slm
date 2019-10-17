@@ -1,0 +1,18 @@
+#!/bin/bash#
+
+#SBATCH -p general # partition (queue)
+#SBATCH -N 1 # number of nodes
+#SBATCH -n 1 # number of cores
+#SBATCH --mem-per-cpu=4GB # memory pool for all cores
+#SBATCH -t 0-2:00 # time (D-HH:MM)
+#SBATCH -J "CliSat_dwn"
+#SBATCH --mail-user=nathanaelwong@fas.harvard.edu
+#SBATCH --mail-type=ALL
+#SBATCH -o clisat_dwn.%N.%j.out # STDOUT
+#SBATCH -e dlisat_dwn.%N.%j.err # STDERR
+
+module load julia/1.1.1-fasrc01
+export JULIA_DEPOT_PATH="/n/holylfs/LABS/kuang_lab/nwong/.julia/:$JULIA_LOAD_PATH"
+export LD_LIBRARY_PATH=/n/holylfs/LABS/kuang_lab/nwong/.julia/conda/3/lib:$LD_LIBRARY_PATH
+
+julia < $filename
