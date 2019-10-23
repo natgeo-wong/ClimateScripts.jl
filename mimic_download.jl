@@ -7,4 +7,8 @@ yr = Dates.year(nw); mo = Dates.month(nw); dy = Dates.day(nw);
 dvec = collect(Date(2016,10,1):Day(1):Date(yr,mo,dy))
 
 # 2) Download data for range of dates
-for datei in dvec; mimicrun(datei,clisatroot(),["SEA","IND"]); end
+@info "$(Dates.now()) - System has $(Sys.free_memory()/2^20)MB of memory left.";
+for datei in dvec;
+    mimicrun(datei,clisatroot(),["SEA","IND"]); GC.gc();
+    @info "$(Dates.now()) - System has $(Sys.free_memory()/2^20)MB of memory left.";
+end
