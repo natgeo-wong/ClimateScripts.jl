@@ -1,5 +1,5 @@
 using Dates
-using ClimateSatellite, ClimateTools
+using ClimateSatellite
 
 # 1) Create range of dates
 nw = Dates.now()-Day(2);
