@@ -26,8 +26,8 @@ function tpwprecip(dvec::Array{Date,1},sroot::AbstractArray)
     return reshape(lvec,(24*size(dvec,1),2))
 end
 
-dvec1 = collect(Date(2017,1,1):Day(1):Date(2017,1,2),sroot="/n/kuangdss01/users/nwong/data/");
-@benchmark tpwprecip(dvec1);
+dvec1 = collect(Date(2017,1,1):Day(1):Date(2017,1,2));
+@benchmark tpwprecip(dvec1,sroot="/n/kuangdss01/users/nwong/data/");
 
-dvec2 = collect(Date(2017,1,1):Day(1):Date(2017,1,10),sroot="/n/kuangdss01/users/nwong/data/");
-@benchmark tpwprecip(dvec2);
+dvec2 = collect(Date(2017,1,1):Day(1):Date(2017,1,10));
+@benchmark tpwprecip(dvec2,sroot="/n/kuangdss01/users/nwong/data/");
