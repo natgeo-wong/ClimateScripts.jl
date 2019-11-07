@@ -1,7 +1,7 @@
 using ClimateSatellite, ClimateEasy
 using BenchmarkTools
 
-function tpwprecip(dvec::Array{Date,1},sroot::AbstractArray=clisatroot())
+function tpwprecip(dvec::Array{Date,1},sroot::AbstractString=clisatroot())
     lvec = zeros(24,size(dvec,1),2); pcoord = [101.5,1.0];
 
     mimicnc = joinpath(mimicfol(Date(2016,10,1),sroot,"SEA"),mimicfile(Date(2016,10,1),"SEA"));
