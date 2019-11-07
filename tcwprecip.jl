@@ -7,6 +7,9 @@ function tpwprecip(dvec::Array{Date,1},sroot::AbstractString=clisatroot())
     mimicnc = joinpath(mimicfol(Date(2016,10,1),sroot,"SEA"),mimicfile(Date(2016,10,1),"SEA"));
     gpmlnc  = joinpath(gpmlfol(Date(2016,10,1),sroot,"SEA"),gpmlncfile(Date(2016,10,1),"SEA"));
 
+    @debug "$(Dates.now()) - MIMIC NetCDF files defined at $(mimicnc)"
+    @debug "$(Dates.now()) - GPM-LATE NetCDF files defined at $(gpmlnc)"
+
     lon_g = ncread(gpmlnc,"lon"); lon_m = ncread(mimicnc,"lon");
     lat_g = ncread(gpmlnc,"lat"); lat_m = ncread(mimicnc,"lat");
     ncclose();
