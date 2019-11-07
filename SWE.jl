@@ -1,6 +1,6 @@
 using ClimateShallowWater
 using Distributions, StatsPlots
-gr()
+pyplot()
 
 g = 9.81; H = 500; dx = 0.1; r = 0.5;
 
@@ -27,8 +27,8 @@ x = convert(Array,-20:dx:20); y = convert(Array,-20:dx:20); dr = sqrt.(x.^2 .+ y
 d = Normal(0,0.5); etam1 = pdf.(d,dr); etan = pdf.(d,dr);
 
 anim = Animation()
-for ii = 1 : (100/dt)
-    plot(x,etan[201,:],xlims=(-20,20),ylims=(-1,1))
+for ii = 1 : (200/dt)
+    contour(x,y,etan,xlims=(-20,20),ylims=(-20,20),clims=(-1,1),levels=-1:0.02:1)
     if isinteger((ii-1)/2); frame(anim); end
     global etap1 = shallowwave2D(etan,etam1,r,"periodic");
     global etam1 = deepcopy(etan); global etan = deepcopy(etap1);

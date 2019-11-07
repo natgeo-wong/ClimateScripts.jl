@@ -7,4 +7,4 @@ yr = Dates.year(nw); mo = Dates.month(nw); dy = Dates.day(nw)
 dvec = collect(Date(2000,6,1):Day(1):Date(yr,mo,dy))
 
 # 2) Download data for range of dates
-for datei in dvec; gpmfrun(datei,clisatroot(),["SEA","IND"]); end
+for datei in dvec; gpmfrun(datei,clisatroot("/n/kuangdss01/users/nwong/data/"),["SEA","IND"]); end
