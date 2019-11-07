@@ -1,4 +1,5 @@
 using ClimateSatellite, ClimateEasy
+using BenchmarkTools
 
 function tpwprecip(dvec::Array{Date,1},sroot::AbstractArray)
     lvec = zeros(24,size(dvec,1),2); pcoord = [101.5,1.0];
@@ -25,5 +26,8 @@ function tpwprecip(dvec::Array{Date,1},sroot::AbstractArray)
     return reshape(lvec,(24*size(dvec,1),2))
 end
 
-dvec = collect(Date(2016,10,1):Day(1):Date(2019,9,30),sroot="/n/kuangdss01/users/nwong/data/");
-lvec = tpwprecip(dvec);
+dvec1 = collect(Date(2017,1,1):Day(1):Date(2017,1,2),sroot="/n/kuangdss01/users/nwong/data/");
+@benchmark tpwprecip(dvec1);
+
+dvec2 = collect(Date(2017,1,1):Day(1):Date(2017,1,10),sroot="/n/kuangdss01/users/nwong/data/");
+@benchmark tpwprecip(dvec2);
