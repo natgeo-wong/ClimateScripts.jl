@@ -1,5 +1,5 @@
 using ClimateSatellite, ClimateEasy
-using BenchmarkTools
+using Dates, NetCDF, BenchmarkTools
 
 function tpwprecip(dvec::Array{Date,1},sroot::AbstractString=clisatroot())
     lvec = zeros(24,size(dvec,1),2); pcoord = [101.5,1.0];
