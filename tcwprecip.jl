@@ -6,9 +6,10 @@ global_logger(ConsoleLogger(stderr,Logging.Warn))
 
 function tpwprecip(dvec::Array{Date,1},sroot::AbstractString=clisatroot())
     lvec = zeros(24,size(dvec,1),2); pcoord = [101.5,1.0];
+    inidate = Date(2016,10,1);
 
-    mimicnc = joinpath(mimicfol(Date(2016,10,1),mimicroot(sroot),"SEA"),mimicfile(Date(2016,10,1),"SEA"));
-    gpmlnc  = joinpath(gpmlfol(Date(2016,10,1),gpmlroot(sroot),"SEA"),gpmlncfile(Date(2016,10,1),"SEA"));
+    mimicnc = joinpath(mimicfol(inidate,mimicroot(sroot),"SEA"),mimicfile(inidate,"SEA"));
+    gpmlnc  = joinpath(gpmlfol(inidate,gpmlroot(sroot),"SEA"),gpmlncfile(inidate,"SEA"));
 
     @debug "$(Dates.now()) - MIMIC NetCDF files defined at $(mimicnc)"
     @debug "$(Dates.now()) - GPM-LATE NetCDF files defined at $(gpmlnc)"
