@@ -1,3 +1,5 @@
 *.o*
 *.e*
 *.slm*
+*.DS_Store*
+*.png*
