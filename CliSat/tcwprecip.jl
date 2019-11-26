@@ -1,6 +1,5 @@
 using ClimateSatellite, ClimateEasy
 using Dates, NetCDF, BenchmarkTools, Statistics, Logging
-using Plots
 
 global_logger(ConsoleLogger(stderr,Logging.Warn))
 
@@ -36,7 +35,3 @@ end
 
 dvec = collect(Date(2017,1,1):Day(1):Date(2018,12,31));
 lvec = tpwprecip(dvec,"/n/kuangdss01/users/nwong/data/");
-
-#plotlyjs()
-scatter(lvec[:,1],lvec[:,2])
-savefig("test.png")
