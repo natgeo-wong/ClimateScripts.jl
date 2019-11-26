@@ -25,5 +25,24 @@ function gpmpoint(dvec::Array{Date,1},sroot::AbstractString=clisatroot())
     return reshape(lvec,(24*size(dvec,1),2))
 end
 
+function gpmmap(year::Integer,sroot::AbstractString=clisatroot())
+
+    inidate = Date(2001,01,1);
+    gpmlnc = joinpath(gpmlfol(inidate,gpmlroot(sroot),"SEA"),gpmlncfile(inidate,"SEA"));
+
+    lon = ncread(gpmlnc,"lon"); nlon = length(lon);
+    lat = ncread(gpmlnc,"lat"); nlat = length(lat);
+    dvec = collect(Date(year,1,1):Day(1):Date(year,12,31)); ndt = length(dvec);
+    lmat = zeros(nlon,nlat,48,ndt);
+
+    for datei in dvec; jj = jj + 1;
+        gpmnc = joinpath(gpmlfol(datei,gpmlroot(sroot),"SEA"),gpmlncfile(datei,"SEA"));
+        lmat[:,:,:,jj] = ncread(gpmnc,"prcp");
+    end
+
+    return lmat
+    
+end
+
 dvec = collect(Date(2001,1,1):Day(1):Date(2018,12,31));
 lvec = gpmpoint(dvec,"/n/kuangdss01/users/nwong/data/");
