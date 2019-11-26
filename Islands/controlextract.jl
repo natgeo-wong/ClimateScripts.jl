@@ -7,10 +7,10 @@ end
 
 function dataextractsfc(parisca::AbstractString,fol::AbstractString,
                         nlon::Integer,nlat::Integer)
-    
+
     @info "$(Dates.now()) - Extracting directory information ..."
     cdir = pwd(); cd(fol); allfol = glob("run00*/"); cd(cdir); nfol = length(allfol);
-    
+
     @info "$(Dates.now()) - Preallocating arrays for mean and standard deviation."
     mdata = zeros(nlon,nlat,nfol-1); sdata = zeros(nlon,nlat,nfol-1);
 
@@ -19,10 +19,10 @@ function dataextractsfc(parisca::AbstractString,fol::AbstractString,
         mdata[:,:,ii-1] = mean(ncread(ncname(fol,ii),parisca),dims=3);
         sdata[:,:,ii-1] = std(ncread(ncname(fol,ii),parisca),dims=3);
     end
-    
+
     @info "$(Dates.now()) - Resorting and reshaping mean data for $(parisca)."
     mdata = mean(mdata,dims=3); mdata = mean(mdata,dims=1)[:]; mdata = (mdata + reverse(mdata))/2;
-    
+
     @info "$(Dates.now()) - Resorting and reshaping standard deviation data for $(parisca)."
     sdata = mean(sdata,dims=3)/sqrt(nfol-1);
     sdata = mean(sdata,dims=1)[:]/sqrt(nlon); sdata = sdata + reverse(sdata);
@@ -51,7 +51,12 @@ function dataextractlvl(parisca::AbstractString,fol::AbstractString,
 
     @info "$(Dates.now()) - Resorting and reshaping mean data for $(parisca)."
     mdata = mean(mdata,dims=4); mdata = mean(mdata,dims=1);
-    mdata = (mdata+reverse(mdata,dims=2))/2; mdata = reshape(mdata,nlat,30);
+
+    if parisca == "vcomp"; mdata = (mdata-reverse(mdata,dims=2))/2;
+    else;                  mdata = (mdata+reverse(mdata,dims=2))/2;
+    end
+
+    mdata = reshape(mdata,nlat,30);
 
     return mdata
 
@@ -83,11 +88,11 @@ QEBfol = "/n/holylfs/LABS/kuang_lab/nwong/isca/isca_out/Islands/T85L30-RRTM-SBM/
 #uwindQEB = dataextractlvl("ucomp",QEBfol,nlon,nlat);
 #@save "./data/controluwind.jld2" uwindQEB uwindRAS
 
-#vwindRAS = dataextractlvl("vcomp",RASfol,nlon,nlat);
-#vwindQEB = dataextractlvl("vcomp",QEBfol,nlon,nlat);
-#@save "./data/controlvwind.jld2" vwindQEB vwindRAS
+vwindRAS = dataextractlvl("vcomp",RASfol,nlon,nlat);
+vwindQEB = dataextractlvl("vcomp",QEBfol,nlon,nlat);
+@save "./data/controlvwind.jld2" vwindQEB vwindRAS
 
-@load "./data/controlvwind.jld2"
-vPsiRAS = vtomeridionalPsi(vwindRAS,pre,lat);
-vPsiQEB = vtomeridionalPsi(vwindQEB,pre,lat);
-@save "./data/controlvPsi.jld2" vPsiQEB vPsiRAS
+#@load "./data/controlvwind.jld2"
+#vPsiRAS = vtomeridionalPsi(vwindRAS,pre,lat);
+#vPsiQEB = vtomeridionalPsi(vwindQEB,pre,lat);
+#@save "./data/controlvPsi.jld2" vPsiQEB vPsiRAS
