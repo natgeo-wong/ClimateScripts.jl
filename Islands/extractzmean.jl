@@ -27,8 +27,10 @@ function dataextractsfc(parisca::AbstractString,fol::AbstractString,
     sdata = mean(sdata,dims=3)/sqrt(nfol-1);
     sdata = mean(sdata,dims=1)[:]/sqrt(nlon); sdata = sdata + reverse(sdata);
 
-    if parisca == "precipitation"; mdata = mdata*24*3600; sdata = sdata*24*3600;
-    elseif parisca == "t_surf";    mdata = mdata .- 273.15;
+    if     parisca == "precipitation";     mdata = mdata*24*3600; sdata = sdata*24*3600;
+    elseif parisca == "condensation_rain"; mdata = mdata*24*3600; sdata = sdata*24*3600;
+    elseif parisca == "convection_rain";   mdata = mdata*24*3600; sdata = sdata*24*3600;
+    elseif parisca == "t_surf";            mdata = mdata .- 273.15;
     end
 
     return mdata,sdata
@@ -87,8 +89,11 @@ function expdata(exp::AbstractString)
     mconvRAS,sconvRAS = dataextractsfc("convection_rain",RASfol,nlon,nlat);
     mconvQEB,sconvQEB = dataextractsfc("convection_rain",QEBfol,nlon,nlat);
 
-    mtempRAS,stempRAS = dataextractsfc("t_surf",RASfol,nlon,nlat);
-    mtempQEB,stempQEB = dataextractsfc("t_surf",QEBfol,nlon,nlat);
+    mtsfcRAS,stsfcRAS = dataextractsfc("t_surf",RASfol,nlon,nlat);
+    mtsfcQEB,stsfcQEB = dataextractsfc("t_surf",QEBfol,nlon,nlat);
+
+    tempRAS = dataextractlvl("temp",RASfol,nlon,nlat);
+    tempQEB = dataextractlvl("temp",QEBfol,nlon,nlat);
 
     uwindRAS = dataextractlvl("ucomp",RASfol,nlon,nlat);
     uwindQEB = dataextractlvl("ucomp",QEBfol,nlon,nlat);
@@ -102,7 +107,8 @@ function expdata(exp::AbstractString)
     @save "./data/$(exp)_prcp.jld2" mprcpRAS sprcpRAS mprcpQEB sprcpQEB
     @save "./data/$(exp)_cond.jld2" mcondRAS scondRAS mcondQEB scondQEB
     @save "./data/$(exp)_conv.jld2" mconvRAS sconvRAS mconvQEB sconvQEB
-    @save "./data/$(exp)_temp.jld2" mtempRAS stempRAS mtempQEB stempQEB
+    @save "./data/$(exp)_tsfc.jld2" mtsfcRAS stsfcRAS mtsfcQEB stsfcQEB
+    @save "./data/$(exp)_temp.jld2" tempRAS tempQEB
     @save "./data/$(exp)_wind.jld2" uwindRAS uwindQEB vPsiRAS vPsiQEB
 
 end
