@@ -1,10 +1,11 @@
 using ClimateSatellite, ClimateEasy
-using Dates, NetCDF, BenchmarkTools, Statistics, Logging
+using Dates, Statistics, Logging
+using JLD2, NetCDF
 
-global_logger(ConsoleLogger(stderr,Logging.Warn))
+global_logger(ConsoleLogger(stdout,Logging.Warn))
 
 function gpmpoint(dvec::Array{Date,1},sroot::AbstractString=clisatroot())
-    lvec = zeros(24,size(dvec,1)); pcoord = [101.5,1.0];
+    lvec = zeros(48,size(dvec,1)); pcoord = [101.5,1.0];
     inidate = Date(2001,01,1);
 
     gpmlnc  = joinpath(gpmlfol(inidate,gpmlroot(sroot),"SEA"),gpmlncfile(inidate,"SEA"));
@@ -14,16 +15,19 @@ function gpmpoint(dvec::Array{Date,1},sroot::AbstractString=clisatroot())
     lon = ncread(gpmlnc,"lon"); lat = ncread(gpmlnc,"lat");
     ncclose();
 
-    ilon,ilat = regionpoint(pcoord,lon,lat); jj = 0;
+    ilon,ilat = regionpoint(pcoord[1],pcoord[2],lon,lat); jj = 0;
 
     for datei in dvec; jj = jj + 1;
+        @warn "$(Dates.now()) - Extracting GPM-LATE data for $(datei)"
         gpmnc   = joinpath(gpmlfol(datei,gpmlroot(sroot),"SEA"),gpmlncfile(datei,"SEA"));
-        gpmii = ncread(gpmnc,"prcp",start=[ilon,ilat,1],count=[1,1,-1]);
-        lvec[:,jj] = convert2hourly(gpmii,true);
+        lvec[:,jj] = ncread(gpmnc,"prcp",start=[ilon,ilat,1],count=[1,1,-1]);
     end
 
-    return reshape(lvec,(24*size(dvec,1),2))
+    return lvec
 end
 
-dvec = collect(Date(2001,1,1):Day(1):Date(2018,12,31));
+dvec = collect(Date(2017,1,1):Day(1):Date(2018,12,31));
 lvec = gpmpoint(dvec,"/n/kuangdss01/users/nwong/data/");
+
+@warn "$(sum(isnan.(lvec)))"
+@save "gpml.jld2" lvec
