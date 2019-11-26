@@ -65,7 +65,7 @@ end
 function vtomeridionalPsi(vwind::Array,pre::Array,lat::Array)
 
     @info "$(Dates.now()) - Cumulative integration of meridional wind to meridional streamfunction."
-    return ((2 * pi * cosd.(lat)' / 9.81) .* cumul_integrate(vwind',pre))'
+    return ((2 * pi * 6370 * 1000 * cosd.(lat)' / 9.81) .* cumul_integrate(pre*100,vwind'))'
 
 end
 
@@ -88,11 +88,11 @@ QEBfol = "/n/holylfs/LABS/kuang_lab/nwong/isca/isca_out/Islands/T85L30-RRTM-SBM/
 #uwindQEB = dataextractlvl("ucomp",QEBfol,nlon,nlat);
 #@save "./data/controluwind.jld2" uwindQEB uwindRAS
 
-vwindRAS = dataextractlvl("vcomp",RASfol,nlon,nlat);
-vwindQEB = dataextractlvl("vcomp",QEBfol,nlon,nlat);
-@save "./data/controlvwind.jld2" vwindQEB vwindRAS
+#vwindRAS = dataextractlvl("vcomp",RASfol,nlon,nlat);
+#vwindQEB = dataextractlvl("vcomp",QEBfol,nlon,nlat);
+#@save "./data/controlvwind.jld2" vwindQEB vwindRAS
 
-#@load "./data/controlvwind.jld2"
-#vPsiRAS = vtomeridionalPsi(vwindRAS,pre,lat);
-#vPsiQEB = vtomeridionalPsi(vwindQEB,pre,lat);
-#@save "./data/controlvPsi.jld2" vPsiQEB vPsiRAS
+@load "./data/controlvwind.jld2"
+vPsiRAS = vtomeridionalPsi(vwindRAS,pre,lat);
+vPsiQEB = vtomeridionalPsi(vwindQEB,pre,lat);
+@save "./data/controlvPsi.jld2" vPsiQEB vPsiRAS
