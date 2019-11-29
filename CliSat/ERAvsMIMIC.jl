@@ -1,9 +1,10 @@
 using ClimateSatellite, ClimateERA, ClimateEasy
 using Dates, Statistics, Logging
-using Glob, NetCDF, JLD2
+using Glob, NetCDF, NCDatasets, JLD2
 
 global_logger(ConsoleLogger(stdout,Logging.Warn))
 
+hdir = pwd();
 init,eroot = erastartup(2,1,"/n/kuangdss01/users/nwong/ecmwf/");
 emod,epar,ereg,time = erainitialize(3,6,3,0,init);
 efol = erafolder(emod,epar,ereg,eroot,"sfc"); eratmp2raw(efol);
@@ -41,9 +42,9 @@ function era5tpw(yrvec::Array,fnc::AbstractString)
     ii = 0; eratpw = [];
     for yr in yrvec; ii = ii + 1;
         @warn "Extracting ERA5 Total Column Water Vapour data for $(yr) ..."
-        fyr = replace(fnc,"1979"=>"$(yr)");
-        if ii == 1; eratpw = ncread(fyr,"tcwv");
-        else; eratpw = cat(dims=3,eratpw,ncread(fyr,"tcwv"));
+        fyr = replace(fnc,"1979"=>"$(yr)"); ds = Dataset(fyr);
+        if ii == 1; eratpw = ds["tcwv"][:]*1;
+        else; eratpw = cat(dims=3,eratpw,ds["tcwv"][:]*1);
         end
     end
 
@@ -56,13 +57,13 @@ dvec = collect(Date(ybeg,1,1):Day(1):Date(yend,12,31)); l = length(dvec);
 eratpw = era5tpw(yrvec,fnc);
 mtpw = mimictpw(yrvec,"/n/kuangdss01/users/nwong/data/");
 
-eratpw = reshape(eratpw,:,l*24); mtpw = reshape(mtpw,:,l*24);
+eratpw = reshape(eratpw,:,l*24); mtpw = reshape(mtpw,:,l*24); cd(hdir);
 @save "test.jld2" eratpw mtpw;
-# npts = size(mtpw,1); rho = zeros(npts)
-#
-# for ii = 1 : npts
-#     eraii = eratpw[ii,:][:]; mii = mtpw[ii,:][:]; ind = !isnan.(mii)
-#     rho[ii] = cor(eraii[ind],mii[ind]);
-# end
-#
-# rho = reshape(rho,nlon,nlat); @save "./data/SEA_rho.jld2" rho;
+npts = size(mtpw,1); rho = zeros(npts);
+
+for ii = 1 : npts
+    eraii = eratpw[ii,:][:]; mii = mtpw[ii,:][:]; ind = .!isnan.(mii);
+    rho[ii] = cor(eraii[ind],mii[ind]);
+end
+
+rho = reshape(rho,nlon,nlat); @save "./data/SEA_rho.jld2" rho;
