@@ -54,7 +54,7 @@ end
 
 yrvec = [2017,2018]; ybeg = yrvec[1]; yend = yrvec[end];
 dvec = collect(Date(ybeg,1,1):Day(1):Date(yend,12,31)); l = length(dvec);
-eratpw = era5tpw(yrvec,fnc);
+eratpw = era5tpw(yrvec,fnc); eratpw = reverse(eratpw,dims=2);
 mtpw = mimictpw(yrvec,"/n/kuangdss01/users/nwong/data/");
 
 eratpw = reshape(eratpw,:,l*24); mtpw = reshape(mtpw,:,l*24); cd(hdir);
