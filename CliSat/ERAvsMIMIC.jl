@@ -66,4 +66,4 @@ for ii = 1 : npts
     rho[ii] = cor(eraii[ind],mii[ind]);
 end
 
-rho = reshape(rho,nlon,nlat); @save "./data/SEA_rho.jld2" rho;
+rho = reshape(rho,301,141); @save "./data/SEA_rho.jld2" rho;
