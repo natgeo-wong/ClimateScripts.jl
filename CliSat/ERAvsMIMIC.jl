@@ -1,5 +1,6 @@
 using ClimateSatellite, ClimateERA, ClimateEasy
-using Dates, NetCDF, BenchmarkTools, Statistics, Logging, JLD2
+using Dates, Statistics, Logging
+using Glob, NetCDF, JLD2
 
 global_logger(ConsoleLogger(stdout,Logging.Warn))
 
@@ -9,7 +10,7 @@ efol = erafolder(emod,epar,ereg,eroot,"sfc"); eratmp2raw(efol);
 
 fnc = glob("*.nc",efol["raw"])[1];
 
-function mimictpw(yrvec::Array{Date,1},sroot::AbstractString=clisatroot())
+function mimictpw(yrvec::Array,sroot::AbstractString=clisatroot())
 
     ybeg = yrvec[1]; yend = yrvec[end];
     dvec = collect(Date(ybeg,1,1):Day(1):Date(yend,12,31));
@@ -28,20 +29,22 @@ function mimictpw(yrvec::Array{Date,1},sroot::AbstractString=clisatroot())
     for datei in dvec; jj = jj + 1;
         @warn "Extracting MIMIC data for $(datei) ..."
         mimicnc = joinpath(mimicfol(datei,mimicroot(sroot),"SEA"),mimicfile(datei,"SEA"));
-        lvec[:,jj] = ncread(mimicnc,"tpw");
+        lvec[:,:,:,jj] = ncread(mimicnc,"tpw");
     end
 
     return reshape(lvec,nlon,nlat,24*size(dvec,1))
 
 end
 
-function era5tpw(yrvec::Array{Date,1},fnc::AbstractArray)
+function era5tpw(yrvec::Array,fnc::AbstractString)
 
-    eratpw = [];
-    for yr in yrvec
+    ii = 0; eratpw = [];
+    for yr in yrvec; ii = ii + 1;
         @warn "Extracting ERA5 Total Column Water Vapour data for $(yr) ..."
-        fyr = replace(fnc,"1979"=>"#$(yr)");
-        eratpw = cat(dims=3,eratpw,ncread(fyr,"tpwv"));
+        fyr = replace(fnc,"1979"=>"$(yr)");
+        if ii == 1; eratpw = ncread(fyr,"tcwv");
+        else; eratpw = cat(dims=3,eratpw,ncread(fyr,"tcwv"));
+        end
     end
 
     return eratpw
@@ -53,8 +56,9 @@ dvec = collect(Date(ybeg,1,1):Day(1):Date(yend,12,31)); l = length(dvec);
 eratpw = era5tpw(yrvec,fnc);
 mtpw = mimictpw(yrvec,"/n/kuangdss01/users/nwong/data/");
 
-eratpw = reshape(eratpw,:,l*24); mtpw = reshape(mtpw,:,l*24); npts = size(mtpw,1)
-rho = zeros(npts)
+eratpw = reshape(eratpw,:,l*24); mtpw = reshape(mtpw,:,l*24);
+@save "test.jld2" eratpw mtpw;
+npts = size(mtpw,1); rho = zeros(npts)
 
 for ii = 1 : npts
     eraii = eratpw[ii,:][:]; mii = mtpw[ii,:][:]; ind = !isnan.(mii)
