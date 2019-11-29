@@ -58,11 +58,11 @@ mtpw = mimictpw(yrvec,"/n/kuangdss01/users/nwong/data/");
 
 eratpw = reshape(eratpw,:,l*24); mtpw = reshape(mtpw,:,l*24);
 @save "test.jld2" eratpw mtpw;
-npts = size(mtpw,1); rho = zeros(npts)
-
-for ii = 1 : npts
-    eraii = eratpw[ii,:][:]; mii = mtpw[ii,:][:]; ind = !isnan.(mii)
-    rho[ii] = cor(eraii[ind],mii[ind]);
-end
-
-rho = reshape(rho,nlon,nlat); @save "./data/SEA_rho.jld2" rho;
+# npts = size(mtpw,1); rho = zeros(npts)
+#
+# for ii = 1 : npts
+#     eraii = eratpw[ii,:][:]; mii = mtpw[ii,:][:]; ind = !isnan.(mii)
+#     rho[ii] = cor(eraii[ind],mii[ind]);
+# end
+#
+# rho = reshape(rho,nlon,nlat); @save "./data/SEA_rho.jld2" rho;
