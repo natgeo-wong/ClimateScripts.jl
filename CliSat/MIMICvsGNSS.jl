@@ -46,10 +46,11 @@ end
 
 stnnames = eosload("SMT")[:,1]
 for stn in stnnames
-    
+
     @warn "$(Dates.now()) - Retrieving data for the $(stn) GNSS station."
     try
-        ybeg = 2017; dvec = collect(Date(ybeg,1,1):Day(1):Date(ybeg,12,31)); yvec = convert(Array,ybeg:ybeg);
+        ybeg = 2017; dvec = collect(Date(ybeg,1,1):Day(1):Date(ybeg,12,31));
+		yvec = convert(Array,ybeg:ybeg);
     	gtpw,gcoord = gnsseostpw(yvec,stn,"/n/kuangdss01/users/nwong/data/");
     	mtpw = mimictpw(dvec,gcoord,"/n/kuangdss01/users/nwong/data/");
     	@save "$(stn)_MIMICvsGNSS.jld2" gtpw mtpw;

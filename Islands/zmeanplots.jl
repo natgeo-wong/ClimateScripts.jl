@@ -2,109 +2,86 @@ using JLD2, MAT
 using Seaborn
 
 cd("/Users/natgeo-wong/Codes/JuliaClimate/ClimateScripts.jl/Islands/");
-reg = matread("./data/lonlatpre.mat");
+reg = matread("./data/lonlatpre.mat"); cmap = ColorMap("RdBu_r");
 lon = reg["lon"][:]; lat = reg["lat"][:]; pre = reg["allpre"][:];
 
-@load "./data/5x5_prcp.jld2"
+@load "./data/1x1_prcp.jld2"; m1x1prcp = mprcpRAS; s1x1prcp = sprcpRAS;
+@load "./data/1x1_conv.jld2"; m1x1conv = mconvRAS; s1x1conv = sconvRAS;
+@load "./data/1x1_cond.jld2"; m1x1cond = mcondRAS; s1x1cond = scondRAS;
 
-close(); figure(figsize=(10,6),dpi=200)
-plot(sind.(lat),mprcpRAS,label="Relaxed Arakawa-Schubert");
-fill_between(sind.(lat),mprcpRAS-sprcpRAS,mprcpRAS+sprcpRAS,alpha=0.3);
-plot(sind.(lat),mprcpQEB,label="Quasi-Equilibrium Betts-Miller");
-fill_between(sind.(lat),mprcpQEB-sprcpQEB,mprcpQEB+sprcpQEB,alpha=0.3);
-xlim(-1,1); ylim(0,10); grid("on")
+@load "./data/control_prcp.jld2"; mconprcp = mprcpRAS; sconprcp = sprcpRAS;
+@load "./data/control_conv.jld2"; mconconv = mconvRAS; sconconv = sconvRAS;
+@load "./data/control_cond.jld2"; mconcond = mcondRAS; sconcond = scondRAS;
+
+mdprcp = m1x1prcp-mconprcp; sdprcp = s1x1prcp+sconprcp;
+mdconv = m1x1conv-mconconv; sdconv = s1x1conv+sconconv;
+mdcond = m1x1cond-mconcond; sdcond = s1x1cond+sconcond;
+
+close(); figure(figsize=(6,5),dpi=200); Seaborn.set()
+plot(sind.(lat),mdprcp,"k",label="Total Precipitation");
+fill_between(sind.(lat),mdprcp-sdprcp,mdprcp+sdprcp,color="k",alpha=0.3);
+plot(sind.(lat),mdconv,"--k",label="Convective Precipitation");
+fill_between(sind.(lat),mdconv-sdconv,mdconv+sdconv,color="k",alpha=0.3);
+plot(sind.(lat),mdcond,":k",label="Condenstation Precipitation");
+fill_between(sind.(lat),mdcond-sdcond,mdcond+sdcond,color="k",alpha=0.3);
+xlim(-1,1); ylim(-5,25); grid("on")
 xticks([-1,-sind(60),-sind(45),-sind(30),-sind(15),0,sind(15),sind(30),sind(45),sind(60),1],
        ["-90","-60","-45","-30","-15","0","15","30","45","60","90"]);
-legend(); xlabel(L"Latitude / $\degree$"); ylabel(L"Precipitation / mm day$^{-1}$");
-savefig("./plots/5x5_prcp.png",bbox_inches="tight")
+legend(); xlabel(L"Latitude / $\degree$");
+ylabel(L"Difference in $P$ (1x1 - Control) / mm day$^{-1}$");
+savefig("./plots/d1c_prcp.png",bbox_inches="tight")
 
-@load "./data/5x5_conv.jld2"
+#########################
 
-mconvRAS = mconvRAS*24*3600; sconvRAS = sconvRAS*24*3600;
-mconvQEB = mconvQEB*24*3600; sconvQEB = sconvQEB*24*3600;
+@load "./data/1x1_tsfc.jld2"; m1x1tsfc = mtsfcRAS;
+@load "./data/1x1_temp.jld2"; m1x1temp = tempRAS;
+@load "./data/control_tsfc.jld2"; mcontsfc = mtsfcRAS;
+@load "./data/control_temp.jld2"; mcontemp = tempRAS;
 
-close(); figure(figsize=(10,6),dpi=200)
-plot(sind.(lat),mconvRAS,label="Relaxed Arakawa-Schubert");
-fill_between(sind.(lat),mconvRAS-sconvRAS,mconvRAS+sconvRAS,alpha=0.3);
-plot(sind.(lat),mconvQEB,label="Quasi-Equilibrium Betts-Miller");
-fill_between(sind.(lat),mconvQEB-sconvQEB,mconvQEB+sconvQEB,alpha=0.3);
-xlim(-1,1); ylim(0,10); grid("on")
-xticks([-1,-sind(60),-sind(45),-sind(30),-sind(15),0,sind(15),sind(30),sind(45),sind(60),1],
-       ["-90","-60","-45","-30","-15","0","15","30","45","60","90"]);
-legend(); xlabel(L"Latitude / $\degree$"); ylabel(L"Convection Precipitation / mm day$^{-1}$");
-savefig("./plots/5x5_conv.png",bbox_inches="tight")
+m1x1temp = hcat(m1x1temp,m1x1tsfc.+273.15)'; mcontemp = hcat(mcontemp,mcontsfc.+273.15)';
+mdtemp = m1x1temp - mcontemp;
 
-@load "./data/5x5_cond.jld2"
-
-mcondRAS = mcondRAS*24*3600; scondRAS = scondRAS*24*3600;
-mcondQEB = mcondQEB*24*3600; scondQEB = scondQEB*24*3600;
-
-close(); figure(figsize=(10,6),dpi=200)
-plot(sind.(lat),mcondRAS,label="Relaxed Arakawa-Schubert");
-fill_between(sind.(lat),mcondRAS-scondRAS,mcondRAS+scondRAS,alpha=0.3);
-plot(sind.(lat),mcondQEB,label="Quasi-Equilibrium Betts-Miller");
-fill_between(sind.(lat),mcondQEB-scondQEB,mcondQEB+scondQEB,alpha=0.3);
-xlim(-1,1); ylim(0,10); grid("on")
-xticks([-1,-sind(60),-sind(45),-sind(30),-sind(15),0,sind(15),sind(30),sind(45),sind(60),1],
-       ["-90","-60","-45","-30","-15","0","15","30","45","60","90"]);
-legend(); xlabel(L"Latitude / $\degree$"); ylabel(L"Condensation Precipitation / mm day$^{-1}$");
-savefig("./plots/5x5_cond.png",bbox_inches="tight")
-
-@load "./data/5x5_temp.jld2"
-
-close(); figure(figsize=(10,6),dpi=200)
-plot(sind.(lat),mtempRAS,label="Relaxed Arakawa-Schubert");
-fill_between(sind.(lat),mtempRAS-stempRAS,mtempRAS+stempRAS,alpha=0.3);
-plot(sind.(lat),mtempQEB,label="Quasi-Equilibrium Betts-Miller");
-fill_between(sind.(lat),mtempQEB-stempQEB,mtempQEB+stempQEB,alpha=0.3);
-xlim(-1,1); ylim(-50,30); grid("on")
-xticks([-1,-sind(60),-sind(45),-sind(30),-sind(15),0,sind(15),sind(30),sind(45),sind(60),1],
-       ["-90","-60","-45","-30","-15","0","15","30","45","60","90"]);
-legend(); xlabel(L"Latitude / $\degree$"); ylabel(L"Temperature / $\degree$C");
-savefig("./plots/5x5_temp.png",bbox_inches="tight")
-
-@load "./data/5x5_wind.jld2"
-
-close(); figure(figsize=(10,6),dpi=200); cmap = ColorMap("RdBu_r")
-contourf(sind.(lat),pre,uwindRAS',levels=-60:5:60,cmap=cmap);
+close(); figure(figsize=(8,5),dpi=200); Seaborn.set()
+c = contour(sind.(lat),vcat(pre,1000),mcontemp,colors="black",levels=160:10:310,linewidths=0.5);
+clabel(c,fontsize=8,inline=1)
+contourf(sind.(lat),vcat(pre,1000),mdtemp,levels=-20:20,cmap=cmap);
 xlim(-1,1); ylim(0,1000); grid("on")
 xticks([-1,-sind(60),-sind(45),-sind(30),-sind(15),0,sind(15),sind(30),sind(45),sind(60),1],
        ["-90","-60","-45","-30","-15","0","15","30","45","60","90"]);
-xlabel(L"Latitude / $\degree$"); ylabel("Pressure / hPa");
-title("Relaxed Arakawa-Schubert")
-colorbar();
+xlabel(L"Latitude / $\degree$"); ylabel("Pressure / hPa"); grid("on")
+title(L"Difference in $T$ (1x1 - Control) / K")
 PyPlot.gca().invert_yaxis()
-savefig("./plots/5x5_uwind_RAS.png",bbox_inches="tight")
+colorbar();
+savefig("./plots/d1c_temp.png",bbox_inches="tight")
 
-close(); figure(figsize=(10,6),dpi=200)
-contourf(sind.(lat),pre,uwindQEB',levels=-60:5:60,cmap=cmap);
+##########################
+
+@load "./data/1x1_wind.jld2";     m1x1uwind = uwindRAS; m1x1vPsi = vPsiRAS;
+@load "./data/control_wind.jld2"; mconuwind = uwindRAS; mconvPsi = vPsiRAS;
+mduwind = m1x1uwind - mconuwind; mdvPsi = m1x1vPsi - mconvPsi;
+
+close(); figure(figsize=(8,5),dpi=200); Seaborn.set()
+c = contour(sind.(lat),pre,mconuwind',colors="black",levels=-60:5:60,linewidths=0.5);
+clabel(c,fontsize=8,inline=1)
+contourf(sind.(lat),pre,mduwind',levels=-40:2:40,cmap=cmap);
 xlim(-1,1); ylim(0,1000); grid("on")
 xticks([-1,-sind(60),-sind(45),-sind(30),-sind(15),0,sind(15),sind(30),sind(45),sind(60),1],
        ["-90","-60","-45","-30","-15","0","15","30","45","60","90"]);
-xlabel(L"Latitude / $\degree$"); ylabel("Pressure / hPa");
-title("Quasi-Equilibrium Betts-Miller")
-colorbar();
+xlabel(L"Latitude / $\degree$"); ylabel("Pressure / hPa"); grid("on")
+title(L"Difference in $u$ (1x1 - Control) / m s$^{-1}$")
 PyPlot.gca().invert_yaxis()
-savefig("./plots/5x5_uwind_QEB.png",bbox_inches="tight")
+colorbar();
+savefig("./plots/d1c_uwind.png",bbox_inches="tight")
 
-close(); figure(figsize=(10,6),dpi=200)
-contourf(sind.(lat),pre,vPsiRAS'/(10^9),levels=-300:25:300,cmap=cmap);
+close(); figure(figsize=(8,5),dpi=200); Seaborn.set()
+c = contour(sind.(lat),pre,mconvPsi'/10^9,colors="black",levels=-200:50:200,linewidths=0.5);
+clabel(c,fontsize=8,inline=1)
+contourf(sind.(lat),pre,mdvPsi'/10^9,levels=-100:10:100,cmap=cmap);
 xlim(-1,1); ylim(0,1000); grid("on")
 xticks([-1,-sind(60),-sind(45),-sind(30),-sind(15),0,sind(15),sind(30),sind(45),sind(60),1],
        ["-90","-60","-45","-30","-15","0","15","30","45","60","90"]);
-xlabel(L"Latitude / $\degree$"); ylabel("Pressure / hPa");
-title("Relaxed Arakawa-Schubert")
-colorbar();
+xlabel(L"Latitude / $\degree$"); ylabel("Pressure / hPa"); grid("on")
+title(L"Difference in $\psi_v$ (1x1 - Control) / $10^9$ kg s$^{-1}$")
 PyPlot.gca().invert_yaxis()
-savefig("./plots/5x5_vPsi_RAS.png",bbox_inches="tight")
-
-close(); figure(figsize=(10,6),dpi=200)
-contourf(sind.(lat),pre,vPsiQEB'/(10^9),levels=-300:25:300,cmap=cmap);
-xlim(-1,1); ylim(0,1000); grid("on")
-xticks([-1,-sind(60),-sind(45),-sind(30),-sind(15),0,sind(15),sind(30),sind(45),sind(60),1],
-       ["-90","-60","-45","-30","-15","0","15","30","45","60","90"]);
-xlabel(L"Latitude / $\degree$"); ylabel("Pressure / hPa");
-title("Quasi-Equilibrium Betts-Miller")
 colorbar();
-PyPlot.gca().invert_yaxis()
-savefig("./plots/5x5_vPsi_QEB.png",bbox_inches="tight")
+savefig("./plots/d1c_vPsi.png",bbox_inches="tight")
