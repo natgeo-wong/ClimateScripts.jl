@@ -66,4 +66,15 @@ for ii = 1 : npts
     rho[ii] = cor(eraii[ind],mii[ind]);
 end
 
-rho = reshape(rho,301,141); @save "./data/SEA_rho.jld2" rho;
+rho = reshape(rho,301,141); @save "./data/SEA_rhohr.jld2" rho;
+
+etpwdy = reshape(mean(reshape(eratpw,:,24,l),dims=2),:,l);
+mtpwdy = reshape(mean(reshape(mtpw,:,24,l),dims=2),:,l);
+npts = size(mtpw,1); rho = zeros(npts);
+
+for ii = 1 : npts
+    eraii = eratpw[ii,:][:]; mii = mtpw[ii,:][:]; ind = .!isnan.(mii);
+    rho[ii] = cor(eraii[ind],mii[ind]);
+end
+
+rho = reshape(rho,301,141); @save "./data/SEA_rhody.jld2" rho;
