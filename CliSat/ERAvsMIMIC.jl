@@ -28,7 +28,6 @@ function mimictpw(yrvec::Array,sroot::AbstractString=clisatroot())
 
     jj = 0;
     for datei in dvec; jj = jj + 1;
-        @warn "Extracting MIMIC data for $(datei) ..."
         mimicnc = joinpath(mimicfol(datei,mimicroot(sroot),"SEA"),mimicfile(datei,"SEA"));
         lvec[:,:,:,jj] = ncread(mimicnc,"tpw");
     end
@@ -41,7 +40,6 @@ function era5tpw(yrvec::Array,fnc::AbstractString)
 
     ii = 0; eratpw = [];
     for yr in yrvec; ii = ii + 1;
-        @warn "Extracting ERA5 Total Column Water Vapour data for $(yr) ..."
         fyr = replace(fnc,"1979"=>"$(yr)"); ds = Dataset(fyr);
         if ii == 1; eratpw = ds["tcwv"][:]*1;
         else; eratpw = cat(dims=3,eratpw,ds["tcwv"][:]*1);
@@ -73,7 +71,7 @@ mtpwdy = reshape(mean(reshape(mtpw,:,24,l),dims=2),:,l);
 npts = size(mtpw,1); rho = zeros(npts);
 
 for ii = 1 : npts
-    eraii = eratpw[ii,:][:]; mii = mtpw[ii,:][:]; ind = .!isnan.(mii);
+    eraii = etpwdy[ii,:][:]; mii = mtpwdy[ii,:][:]; ind = .!isnan.(mii);
     rho[ii] = cor(eraii[ind],mii[ind]);
 end
 
