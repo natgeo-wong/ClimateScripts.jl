@@ -11,31 +11,32 @@ efol = erafolder(emod,epar,ereg,eroot,"sfc"); eratmp2raw(efol);
 
 fnc = glob("*.nc",efol["raw"])[1];
 
-function gpmrain(yrvec::Array,sroot::AbstractString=clisatroot())
+function gpmprcp(yrvec::Array,sroot::AbstractString=clisatroot())
 
     ybeg = yrvec[1]; yend = yrvec[end];
     dvec = collect(Date(ybeg,1,1):Day(1):Date(yend,12,31));
     inidate = Date(2016,10,1);
 
     gpmlnc = joinpath(gpmlfol(inidate,gpmlroot(sroot),"SEA"),gpmlncfile(inidate,"SEA"));
-    lon = ncread(mimicnc,"lon"); nlon = length(lon); mlon = convert(Array,lon[1]:0.25:lon[end]);
-    lat = ncread(mimicnc,"lat"); nlat = length(lat); mlat = convert(Array,lat[1]:0.25:lat[end]);
-    lvec = zeros(nlon,nlat,24*size(dvec,1));
-
+    lon = ncread(gpmlnc,"lon"); nlon = length(lon); mlon = convert(Array,90:0.25:165);
+    lat = ncread(gpmlnc,"lat"); nlat = length(lat); mlat = convert(Array,-15:0.25:20);
+    lvec = zeros(length(mlon),length(mlat),24*size(dvec,1));
+    @warn mlon; @warn mlat;
+    
     jj = 0;
     for datei in dvec
         @warn "$(Dates.now()) - Extracting GPM data for $(datei) ..."
-        gpmlnc = joinpath(gpmlfol(datei,gpmlroot(sroot),"SEA"),gpmlncfile(inidate,"SEA"));
-        gpmii = reshape(ncread(gpmnc,"prcp"),nlon,nlat,:,24); gpmii = mean(gpmii,dims=3);
-        gpmii = reshape(nlon,nlat,24)
+        gpmlnc = joinpath(gpmlfol(datei,gpmlroot(sroot),"SEA"),gpmlncfile(datei,"SEA"));
+        gpmii = reshape(ncread(gpmlnc,"prcp"),nlon,nlat,:,24); gpmii = mean(gpmii,dims=3);
+        gpmii = reshape(gpmii,nlon,nlat,24)
         @warn "$(Dates.now()) - Interpolating hourly data from GPM grid to ERA grid resolution ..."
         for tt = 1 : 24
-            spl = Spline2D(lon,lat,gpmii[:,:,tt]); lvec[:,:,tt+jj*24] = evaluate(spl,mlon,mlat)
+            spl = Spline2D(lon,lat,gpmii[:,:,tt]); lvec[:,:,tt+jj*24] = evalgrid(spl,mlon,mlat)
         end
         jj = jj + 1;
     end
 
-    return reshape(lvec,nlon,nlat,24*size(dvec,1))
+    return lvec
 
 end
 
@@ -56,7 +57,7 @@ end
 yrvec = [2017,2018]; ybeg = yrvec[1]; yend = yrvec[end];
 dvec = collect(Date(ybeg,1,1):Day(1):Date(yend,12,31)); l = length(dvec);
 eratpw  = era5tpw(yrvec,fnc); eratpw = reverse(eratpw,dims=2);
-gpmrain = gpmrain(yrvec,"/n/kuangdss01/users/nwong/data/");
+gpmrain = gpmprcp(yrvec,"/n/kuangdss01/users/nwong/data/");
 
 eratpw = reshape(eratpw,:,l*24); gpmrain = reshape(gpmrain,:,l*24); cd(hdir);
 npts = size(gpmrain,1); rho = zeros(npts);
@@ -66,15 +67,15 @@ for ii = 1 : npts
     rho[ii] = cor(eraii[ind],gii[ind]);
 end
 
-rho = reshape(rho,301,141); @save "./data/SEA_rhohr.jld2" rho;
+rho = reshape(rho,301,141); @save "./data/SEA_ERAvGPM_rhohr.jld2" rho;
 
 etpwdy = reshape(mean(reshape(eratpw,:,24,l),dims=2),:,l);
 raindy = reshape(mean(reshape(gpmrain,:,24,l),dims=2),:,l);
-npts = size(mtpw,1); rho = zeros(npts);
+npts = size(gpmrain,1); rho = zeros(npts);
 
 for ii = 1 : npts
     eraii = etpwdy[ii,:][:]; gii = raindy[ii,:][:]; ind = .!isnan.(gii);
     rho[ii] = cor(eraii[ind],gii[ind]);
 end
 
-rho = reshape(rho,301,141); @save "./data/SEA_rhody.jld2" rho;
+rho = reshape(rho,301,141); @save "./data/SEA_ERAvGPM_rhody.jld2" rho;
