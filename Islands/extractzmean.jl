@@ -77,42 +77,43 @@ function expdata(exp::AbstractString)
     lon = reg["lon"][:]; lat = reg["lat"][:]; pre = reg["allpre"][:];
     nlon = length(lon); nlat = length(lat);
 
-    RASfol = "/n/holylfs/LABS/kuang_lab/nwong/isca/isca_out/Islands/T85L30-RRTM-RAS/$(exp)/";
-    QEBfol = "/n/holylfs/LABS/kuang_lab/nwong/isca/isca_out/Islands/T85L30-RRTM-SBM/$(exp)/";
+    RASfol = "/n/holylfs/LABS/kuang_lab/nwong/isca/isca_out/Islands/0QFLUX-RAS/$(exp)/";
+    #QEBfol = "/n/holylfs/LABS/kuang_lab/nwong/isca/isca_out/Islands/T85L30-RRTM-SBM/$(exp)/";
 
     mprcpRAS,sprcpRAS = dataextractsfc("precipitation",RASfol,nlon,nlat);
-    mprcpQEB,sprcpQEB = dataextractsfc("precipitation",QEBfol,nlon,nlat);
+    #mprcpQEB,sprcpQEB = dataextractsfc("precipitation",QEBfol,nlon,nlat);
 
     mcondRAS,scondRAS = dataextractsfc("condensation_rain",RASfol,nlon,nlat);
-    mcondQEB,scondQEB = dataextractsfc("condensation_rain",QEBfol,nlon,nlat);
+    #mcondQEB,scondQEB = dataextractsfc("condensation_rain",QEBfol,nlon,nlat);
 
     mconvRAS,sconvRAS = dataextractsfc("convection_rain",RASfol,nlon,nlat);
-    mconvQEB,sconvQEB = dataextractsfc("convection_rain",QEBfol,nlon,nlat);
+    #mconvQEB,sconvQEB = dataextractsfc("convection_rain",QEBfol,nlon,nlat);
 
     mtsfcRAS,stsfcRAS = dataextractsfc("t_surf",RASfol,nlon,nlat);
-    mtsfcQEB,stsfcQEB = dataextractsfc("t_surf",QEBfol,nlon,nlat);
+    #mtsfcQEB,stsfcQEB = dataextractsfc("t_surf",QEBfol,nlon,nlat);
 
     tempRAS = dataextractlvl("temp",RASfol,nlon,nlat);
-    tempQEB = dataextractlvl("temp",QEBfol,nlon,nlat);
+    #tempQEB = dataextractlvl("temp",QEBfol,nlon,nlat);
 
     uwindRAS = dataextractlvl("ucomp",RASfol,nlon,nlat);
-    uwindQEB = dataextractlvl("ucomp",QEBfol,nlon,nlat);
+    #uwindQEB = dataextractlvl("ucomp",QEBfol,nlon,nlat);
 
     vwindRAS = dataextractlvl("vcomp",RASfol,nlon,nlat);
-    vwindQEB = dataextractlvl("vcomp",QEBfol,nlon,nlat);
+    #vwindQEB = dataextractlvl("vcomp",QEBfol,nlon,nlat);
 
     vPsiRAS = vtomeridionalPsi(vwindRAS,pre,lat);
-    vPsiQEB = vtomeridionalPsi(vwindQEB,pre,lat);
+    #vPsiQEB = vtomeridionalPsi(vwindQEB,pre,lat);
 
-    @save "./data/$(exp)_prcp.jld2" mprcpRAS sprcpRAS mprcpQEB sprcpQEB
-    @save "./data/$(exp)_cond.jld2" mcondRAS scondRAS mcondQEB scondQEB
-    @save "./data/$(exp)_conv.jld2" mconvRAS sconvRAS mconvQEB sconvQEB
-    @save "./data/$(exp)_tsfc.jld2" mtsfcRAS stsfcRAS mtsfcQEB stsfcQEB
-    @save "./data/$(exp)_temp.jld2" tempRAS tempQEB
-    @save "./data/$(exp)_wind.jld2" uwindRAS uwindQEB vPsiRAS vPsiQEB
+    @save "./data/$(exp)_prcp.jld2" mprcpRAS sprcpRAS #mprcpQEB sprcpQEB
+    @save "./data/$(exp)_cond.jld2" mcondRAS scondRAS #mcondQEB scondQEB
+    @save "./data/$(exp)_conv.jld2" mconvRAS sconvRAS #mconvQEB sconvQEB
+    @save "./data/$(exp)_tsfc.jld2" mtsfcRAS stsfcRAS #mtsfcQEB stsfcQEB
+    @save "./data/$(exp)_temp.jld2" tempRAS #tempQEB
+    @save "./data/$(exp)_wind.jld2" uwindRAS vPsiRAS #uwindQEB vPsiQEB
 
 end
 
 expdata("control")
-expdata("1x1"); expdata("2x2"); expdata("3x3"); expdata("5x5")
-expdata("csmall"); expdata("cmed"); expdata("clarge");
+expdata("1x1"); #expdata("2x2"); #expdata("3x3");
+expdata("5x5")
+#expdata("csmall"); expdata("cmed"); expdata("clarge");

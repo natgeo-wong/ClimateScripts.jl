@@ -103,5 +103,5 @@ function EvGmap!(emap::Array,reg::Integer,yrvec::Array,evec::Array)
 
 end
 
-emap,einf = EvGmap(3,[2017,2018],convert(Array,10:0.5:80))
-@save "./data/ERAvsGPM_Muller.jld2" emap einf
+emap,einf = EvGmap(3,[2001,2018],convert(Array,10:0.5:90))
+@save "./data/ERAvsGPM_Muller_all.jld2" emap einf
