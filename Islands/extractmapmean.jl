@@ -106,6 +106,7 @@ function expdata(exp::AbstractString)
 
 end
 
+expdata("control");
 expdata("realcont")
 #expdata("1x1"); expdata("2x2"); expdata("3x3"); expdata("5x5")
 #expdata("csmall"); expdata("cmed"); expdata("clarge");
