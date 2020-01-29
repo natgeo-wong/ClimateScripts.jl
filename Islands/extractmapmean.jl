@@ -88,13 +88,13 @@ function expdata(exp::AbstractString)
     tempRAS = dataextractlvl("temp",RASfol,nlon,nlat);
     #tempQEB = dataextractlvl("temp",QEBfol,nlon,nlat);
 
-    uwindRAS = dataextractlvl("ucomp",RASfol,nlon,nlat);
+    #uwindRAS = dataextractlvl("ucomp",RASfol,nlon,nlat);
     #uwindQEB = dataextractlvl("ucomp",QEBfol,nlon,nlat);
 
-    vwindRAS = dataextractlvl("vcomp",RASfol,nlon,nlat);
+    #vwindRAS = dataextractlvl("vcomp",RASfol,nlon,nlat);
     #vwindQEB = dataextractlvl("vcomp",QEBfol,nlon,nlat);
 
-    vPsiRAS = vtomeridionalPsi(vwindRAS,pre,lat);
+    #vPsiRAS = vtomeridionalPsi(vwindRAS,pre,lat);
     #vPsiQEB = vtomeridionalPsi(vwindQEB,pre,lat);
 
     @save "./data/$(exp)_map_prcp.jld2" mprcpRAS sprcpRAS #mprcpQEB sprcpQEB
@@ -102,7 +102,7 @@ function expdata(exp::AbstractString)
     @save "./data/$(exp)_map_conv.jld2" mconvRAS sconvRAS #mconvQEB sconvQEB
     @save "./data/$(exp)_map_tsfc.jld2" mtsfcRAS stsfcRAS #mtsfcQEB stsfcQEB
     @save "./data/$(exp)_map_temp.jld2" tempRAS #tempQEB
-    @save "./data/$(exp)_map_wind.jld2" uwindRAS vPsiRAS #uwindQEB vPsiQEB
+    #@save "./data/$(exp)_map_wind.jld2" uwindRAS vPsiRAS #uwindQEB vPsiQEB
 
 end
 
