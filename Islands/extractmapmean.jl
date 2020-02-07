@@ -20,7 +20,7 @@ function dataextractsfc(parisca::AbstractString,fol::AbstractString,
     end
 
     @info "$(Dates.now()) - Resorting and reshaping mean data for $(parisca)."
-    mdata = mean(mdata,dims=3); mdata = (mdata + reverse(mdata,dims=2))/2;
+    mdata = mean(mdata,dims=3); #mdata = (mdata + reverse(mdata,dims=2))/2;
 
     if     parisca == "precipitation";     mdata = mdata*24*3600; sdata = sdata*24*3600;
     elseif parisca == "condensation_rain"; mdata = mdata*24*3600; sdata = sdata*24*3600;
@@ -49,9 +49,9 @@ function dataextractlvl(parisca::AbstractString,fol::AbstractString,
     @info "$(Dates.now()) - Resorting and reshaping mean data for $(parisca)."
     mdata = mean(mdata,dims=4);
 
-    if parisca == "vcomp"; mdata = (mdata-reverse(mdata,dims=2))/2;
-    else;                  mdata = (mdata+reverse(mdata,dims=2))/2;
-    end
+    #if parisca == "vcomp"; mdata = (mdata-reverse(mdata,dims=2))/2;
+    #else;                  mdata = (mdata+reverse(mdata,dims=2))/2;
+    #end
 
     return mdata
 
