@@ -2,7 +2,7 @@ using Statistics, NumericalIntegration
 using NetCDF, MAT, Glob, Statistics, JLD2
 
 function ncname(fol::AbstractString,ii::Integer)
-    fnc = "$(fol)/run000$(ii)/atmos_daily.nc"
+    fnc = "$(fol)/run00$(@sprintf("%02d",ii))/atmos_daily.nc"
 end
 
 function dataextractsfc(parisca::AbstractString,fol::AbstractString,
@@ -14,9 +14,9 @@ function dataextractsfc(parisca::AbstractString,fol::AbstractString,
     @info "$(Dates.now()) - Preallocating arrays for mean and standard deviation."
     mdata = zeros(nlon,nlat,nfol-1); sdata = zeros(nlon,nlat,nfol-1);
 
-    for ii = 2 : nfol
+    for ii = 11 : nfol
         @info "$(Dates.now()) - Calculating mean for $(parisca)"
-        mdata[:,:,ii-1] = mean(ncread(ncname(fol,ii),parisca),dims=3);
+        mdata[:,:,ii-10] = mean(ncread(ncname(fol,ii),parisca),dims=3);
     end
 
     @info "$(Dates.now()) - Resorting and reshaping mean data for $(parisca)."
@@ -39,11 +39,11 @@ function dataextractlvl(parisca::AbstractString,fol::AbstractString,
     cdir = pwd(); cd(fol); allfol = glob("run00*/"); cd(cdir); nfol = length(allfol);
 
     @info "$(Dates.now()) - Preallocating arrays for mean."
-    mdata = zeros(nlon,nlat,30,nfol-1);
+    mdata = zeros(nlon,nlat,40,nfol-1);
 
-    for ii = 2 : nfol
+    for ii = 11 : nfol
         @info "$(Dates.now()) - Calculating mean for $(parisca)"
-        mdata[:,:,:,ii-1] = mean(ncread(ncname(fol,ii),parisca),dims=4);
+        mdata[:,:,:,ii-10] = mean(ncread(ncname(fol,ii),parisca),dims=4);
     end
 
     @info "$(Dates.now()) - Resorting and reshaping mean data for $(parisca)."
@@ -106,7 +106,7 @@ function expdata(exp::AbstractString)
 
 end
 
-expdata("control");
+#expdata("control");
 #expdata("realcont")
-expdata("1x1"); #expdata("2x2"); expdata("3x3"); expdata("5x5")
+expdata("seasonal"); #expdata("2x2"); expdata("3x3"); expdata("5x5")
 #expdata("csmall"); expdata("cmed"); expdata("clarge");
