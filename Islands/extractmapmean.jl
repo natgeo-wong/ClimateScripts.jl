@@ -12,7 +12,7 @@ function dataextractsfc(parisca::AbstractString,fol::AbstractString,
     cdir = pwd(); cd(fol); allfol = glob("run00*/"); cd(cdir); nfol = length(allfol);
 
     @info "$(Dates.now()) - Preallocating arrays for mean and standard deviation."
-    mdata = zeros(nlon,nlat,nfol-1); sdata = zeros(nlon,nlat,nfol-1);
+    mdata = zeros(nlon,nlat,nfol-10); sdata = zeros(nlon,nlat,nfol-1);
 
     for ii = 11 : nfol
         @info "$(Dates.now()) - Calculating mean for $(parisca)"
