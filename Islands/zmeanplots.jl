@@ -1,21 +1,21 @@
 using JLD2, MAT
 using Seaborn
 
-cd("/Users/natgeo-wong/Codes/JuliaClimate/ClimateScripts.jl/Islands/");
+cd("/Users/natgeo-wong/Projects/JuliaClimate/Islands/");
 reg = matread("./data/lonlatpre.mat"); cmap = ColorMap("RdBu_r");
 lon = reg["lon"][:]; lat = reg["lat"][:]; pre = reg["allpre"][:];
 
-@load "./data/1x1_prcp.jld2"; m1x1prcp = mprcpRAS; s1x1prcp = sprcpRAS;
-@load "./data/1x1_conv.jld2"; m1x1conv = mconvRAS; s1x1conv = sconvRAS;
-@load "./data/1x1_cond.jld2"; m1x1cond = mcondRAS; s1x1cond = scondRAS;
+@load "./data/realcont_prcp.jld2"; mrcprcp = mprcpRAS; srcprcp = sprcpRAS;
+@load "./data/realcont_conv.jld2"; mrcconv = mconvRAS; srcconv = sconvRAS;
+@load "./data/realcont_cond.jld2"; mrccond = mcondRAS; srccond = scondRAS;
 
 @load "./data/control_prcp.jld2"; mconprcp = mprcpRAS; sconprcp = sprcpRAS;
 @load "./data/control_conv.jld2"; mconconv = mconvRAS; sconconv = sconvRAS;
 @load "./data/control_cond.jld2"; mconcond = mcondRAS; sconcond = scondRAS;
 
-mdprcp = m1x1prcp-mconprcp; sdprcp = s1x1prcp+sconprcp;
-mdconv = m1x1conv-mconconv; sdconv = s1x1conv+sconconv;
-mdcond = m1x1cond-mconcond; sdcond = s1x1cond+sconcond;
+mdprcp = mrcprcp-mconprcp; sdprcp = srcprcp+sconprcp;
+mdconv = mrcconv-mconconv; sdconv = srcconv+sconconv;
+mdcond = mrccond-mconcond; sdcond = srccond+sconcond;
 
 close(); figure(figsize=(6,5),dpi=200); Seaborn.set()
 plot(sind.(lat),mdprcp,"k",label="Total Precipitation");
@@ -28,18 +28,18 @@ xlim(-1,1); ylim(-5,25); grid("on")
 xticks([-1,-sind(60),-sind(45),-sind(30),-sind(15),0,sind(15),sind(30),sind(45),sind(60),1],
        ["-90","-60","-45","-30","-15","0","15","30","45","60","90"]);
 legend(); xlabel(L"Latitude / $\degree$");
-ylabel(L"Difference in $P$ (1x1 - Control) / mm day$^{-1}$");
-savefig("./plots/d1c_prcp.png",bbox_inches="tight")
+ylabel(L"Difference in $P$ (rc - Control) / mm day$^{-1}$");
+savefig("./plots/drc_0qflux_prcp.png",bbox_inches="tight")
 
 #########################
 
-@load "./data/1x1_tsfc.jld2"; m1x1tsfc = mtsfcRAS;
-@load "./data/1x1_temp.jld2"; m1x1temp = tempRAS;
+@load "./data/realcont_tsfc.jld2"; mrctsfc = mtsfcRAS;
+@load "./data/realcont_temp.jld2"; mrctemp = tempRAS;
 @load "./data/control_tsfc.jld2"; mcontsfc = mtsfcRAS;
 @load "./data/control_temp.jld2"; mcontemp = tempRAS;
 
-m1x1temp = hcat(m1x1temp,m1x1tsfc.+273.15)'; mcontemp = hcat(mcontemp,mcontsfc.+273.15)';
-mdtemp = m1x1temp - mcontemp;
+mrctemp = hcat(mrctemp,mrctsfc.+273.15)'; mcontemp = hcat(mcontemp,mcontsfc.+273.15)';
+mdtemp = mrctemp - mcontemp;
 
 close(); figure(figsize=(8,5),dpi=200); Seaborn.set()
 c = contour(sind.(lat),vcat(pre,1000),mcontemp,colors="black",levels=160:10:310,linewidths=0.5);
@@ -49,16 +49,16 @@ xlim(-1,1); ylim(0,1000); grid("on")
 xticks([-1,-sind(60),-sind(45),-sind(30),-sind(15),0,sind(15),sind(30),sind(45),sind(60),1],
        ["-90","-60","-45","-30","-15","0","15","30","45","60","90"]);
 xlabel(L"Latitude / $\degree$"); ylabel("Pressure / hPa"); grid("on")
-title(L"Difference in $T$ (1x1 - Control) / K")
+title(L"Difference in $T$ (rc - Control) / K")
 PyPlot.gca().invert_yaxis()
 colorbar();
-savefig("./plots/d1c_temp.png",bbox_inches="tight")
+savefig("./plots/drc_0qflux_temp.png",bbox_inches="tight")
 
 ##########################
 
-@load "./data/1x1_wind.jld2";     m1x1uwind = uwindRAS; m1x1vPsi = vPsiRAS;
+@load "./data/realcont_wind.jld2";     mrcuwind = uwindRAS; mrcvPsi = vPsiRAS;
 @load "./data/control_wind.jld2"; mconuwind = uwindRAS; mconvPsi = vPsiRAS;
-mduwind = m1x1uwind - mconuwind; mdvPsi = m1x1vPsi - mconvPsi;
+mduwind = mrcuwind - mconuwind; mdvPsi = mrcvPsi - mconvPsi;
 
 close(); figure(figsize=(8,5),dpi=200); Seaborn.set()
 c = contour(sind.(lat),pre,mconuwind',colors="black",levels=-60:5:60,linewidths=0.5);
@@ -68,10 +68,10 @@ xlim(-1,1); ylim(0,1000); grid("on")
 xticks([-1,-sind(60),-sind(45),-sind(30),-sind(15),0,sind(15),sind(30),sind(45),sind(60),1],
        ["-90","-60","-45","-30","-15","0","15","30","45","60","90"]);
 xlabel(L"Latitude / $\degree$"); ylabel("Pressure / hPa"); grid("on")
-title(L"Difference in $u$ (1x1 - Control) / m s$^{-1}$")
+title(L"Difference in $u$ (rc - Control) / m s$^{-1}$")
 PyPlot.gca().invert_yaxis()
 colorbar();
-savefig("./plots/d1c_uwind.png",bbox_inches="tight")
+savefig("./plots/drc_0qflux_uwind.png",bbox_inches="tight")
 
 close(); figure(figsize=(8,5),dpi=200); Seaborn.set()
 c = contour(sind.(lat),pre,mconvPsi'/10^9,colors="black",levels=-200:50:200,linewidths=0.5);
@@ -81,7 +81,18 @@ xlim(-1,1); ylim(0,1000); grid("on")
 xticks([-1,-sind(60),-sind(45),-sind(30),-sind(15),0,sind(15),sind(30),sind(45),sind(60),1],
        ["-90","-60","-45","-30","-15","0","15","30","45","60","90"]);
 xlabel(L"Latitude / $\degree$"); ylabel("Pressure / hPa"); grid("on")
-title(L"Difference in $\psi_v$ (1x1 - Control) / $10^9$ kg s$^{-1}$")
+title(L"Difference in $\psi_v$ (rc - Control) / $10^9$ kg s$^{-1}$")
 PyPlot.gca().invert_yaxis()
 colorbar();
-savefig("./plots/d1c_vPsi.png",bbox_inches="tight")
+savefig("./plots/drc_0qflux_vPsi.png",bbox_inches="tight")
+
+close(); figure(figsize=(8,5),dpi=200); Seaborn.set()
+c = contourf(sind.(lat),pre,mrcvPsi'/10^9,levels=-400:20:400,cmap=cmap);
+xlim(-1,1); ylim(0,1000); grid("on")
+xticks([-1,-sind(60),-sind(45),-sind(30),-sind(15),0,sind(15),sind(30),sind(45),sind(60),1],
+       ["-90","-60","-45","-30","-15","0","15","30","45","60","90"]);
+xlabel(L"Latitude / $\degree$"); ylabel("Pressure / hPa"); grid("on")
+title(L"Difference in $\psi_v$ (rc - Control) / $10^9$ kg s$^{-1}$")
+PyPlot.gca().invert_yaxis()
+colorbar();
+savefig("./plots/rc_0qflux_vPsi.png",bbox_inches="tight")

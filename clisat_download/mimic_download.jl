@@ -1,10 +1,9 @@
-using Dates
 using ClimateSatellite
 
-# 1) Create range of dates
-nw = Dates.now()-Day(2);
-yr = Dates.year(nw); mo = Dates.month(nw); dy = Dates.day(nw);
-dvec = collect(Date(2016,10,1):Day(1):Date(yr,mo,dy))
+global_logger(ConsoleLogger(stderr,Logging.Info))
 
-# 2) Download data for range of dates
-for datei in dvec; mimicrun(datei,clisatroot("/n/kuangdss01/users/nwong/data/"),["SEA","IND"]); end
+user = "natgeo.wong@outlook.com";
+rvec = ["TRP"];
+ddir = "/n/kuangdss01/user/nwong/clisat/"
+
+clisatdownload("mtpw2m",Date(2017,1),email=user,regions=rvec);

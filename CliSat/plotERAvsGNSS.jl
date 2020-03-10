@@ -13,8 +13,6 @@ function findPi(rlon::AbstractArray,rlat::AbstractArray)
         Pi[:,:,ii] = ncread(fnc[ii],"raw_year_mu")
     end
 
-    @info sum(isnan.(Pi))
-
     return mean(Pi,dims=3)
 
 end

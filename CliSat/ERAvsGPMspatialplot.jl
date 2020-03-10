@@ -11,21 +11,21 @@ x = xy[:,1]; y = xy[:,2];
 
 close(); figure(figsize=(16,13),dpi=200); Seaborn.set()
 
-subplot(211); @load "./data/SEA_ERAvsMIMIC_rhohr.jld2"
-contourf(lon,latSN,rho',levels=0:0.05:1,cmap="viridis")
+subplot(211); @load "./data/SEA_ERAvGPM_rhohr.jld2"
+contourf(lon,latSN,rho',levels=0:0.1:1,cmap="viridis")
 plot(x,y,"k",linewidth=0.5);
 axis("scaled"); xlim(W,E); ylim(S,N); grid("on")
 xticks(90:5:165,[]); ylabel(L"Latitude / $\degree$"); title("Correlation (Hourly)")
 colorbar();
 
-subplot(212); @load "./data/SEA_ERAvsMIMIC_rhody.jld2"
-contourf(lon,latSN,rho',levels=0:0.05:1,cmap="viridis")
+subplot(212); @load "./data/SEA_ERAvGPM_rhody.jld2"
+contourf(lon,latSN,rho',levels=0:0.1:1,cmap="viridis")
 plot(x,y,"k",linewidth=0.5);
 axis("scaled"); xlim(W,E); ylim(S,N); grid("on")
 xticks(90:5:165); xlabel(L"Longitude / $\degree$"); ylabel(L"Latitude / $\degree$");
 colorbar(); title("Correlation (Daily)")
 
-savefig("./fig/rho_ERAvMIMIC_SEA.png",bbox_inches="tight")
+savefig("./fig/rho_ERAvGPM_SEA.png",bbox_inches="tight")
 
 
 # init,eroot = erastartup(2,1,"/Volumes/CliNat-ERA/");
